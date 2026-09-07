@@ -29,6 +29,7 @@ import (
 type OperatorV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	ManualApprovalGatesGetter
+	OpenShiftBuildsGetter
 	OpenShiftPipelinesAsCodesGetter
 	SyncerServicesGetter
 	TektonAddonsGetter
@@ -51,6 +52,10 @@ type OperatorV1alpha1Client struct {
 
 func (c *OperatorV1alpha1Client) ManualApprovalGates() ManualApprovalGateInterface {
 	return newManualApprovalGates(c)
+}
+
+func (c *OperatorV1alpha1Client) OpenShiftBuilds() OpenShiftBuildInterface {
+	return newOpenShiftBuilds(c)
 }
 
 func (c *OperatorV1alpha1Client) OpenShiftPipelinesAsCodes() OpenShiftPipelinesAsCodeInterface {

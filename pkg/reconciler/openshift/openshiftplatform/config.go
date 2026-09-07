@@ -18,6 +18,7 @@ package openshiftplatform
 
 import (
 	k8sInstallerSet "github.com/tektoncd/operator/pkg/reconciler/kubernetes/tektoninstallerset"
+	openshiftBuilds "github.com/tektoncd/operator/pkg/reconciler/openshift/builds"
 	openshiftManualApprovalGate "github.com/tektoncd/operator/pkg/reconciler/openshift/manualapprovalgate"
 	"github.com/tektoncd/operator/pkg/reconciler/openshift/openshiftpipelinesascode"
 	openshiftSyncerService "github.com/tektoncd/operator/pkg/reconciler/openshift/syncerservice"
@@ -95,6 +96,10 @@ var (
 		platform.ControllerSyncerService: injection.NamedControllerConstructor{
 			Name:                  string(platform.ControllerSyncerService),
 			ControllerConstructor: openshiftSyncerService.NewController,
+		},
+		platform.ControllerOpenShiftBuild: injection.NamedControllerConstructor{
+			Name:                  string(platform.ControllerOpenShiftBuild),
+			ControllerConstructor: openshiftBuilds.NewController,
 		},
 	}
 )

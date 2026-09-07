@@ -20,6 +20,8 @@ package v1alpha1
 
 type ManualApprovalGateExpansion interface{}
 
+type OpenShiftBuildExpansion interface{}
+
 type OpenShiftPipelinesAsCodeExpansion interface{}
 
 type SyncerServiceExpansion interface{}

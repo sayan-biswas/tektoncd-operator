@@ -1,0 +1,87 @@
+/*
+Copyright 2026 The Tekton Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package openshiftbuild
+
+import (
+	"testing"
+
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+)
+
+func TestRemoveRunAsUserRunAsGroup(t *testing.T) {
+	deployment := &unstructured.Unstructured{Object: map[string]interface{}{
+		"apiVersion": "apps/v1",
+		"kind":       "Deployment",
+		"metadata":   map[string]interface{}{"name": "shp-build-controller"},
+		"spec": map[string]interface{}{
+			"template": map[string]interface{}{
+				"spec": map[string]interface{}{
+					"securityContext": map[string]interface{}{
+						"runAsUser":    int64(1000),
+						"runAsGroup":   int64(1000),
+						"runAsNonRoot": true,
+					},
+					"containers": []interface{}{
+						map[string]interface{}{
+							"name": "manager",
+							"securityContext": map[string]interface{}{
+								"runAsUser":  int64(65532),
+								"runAsGroup": int64(65532),
+							},
+						},
+					},
+				},
+			},
+		},
+	}}
+
+	if err := removeRunAsUserRunAsGroup(deployment); err != nil {
+		t.Fatalf("removeRunAsUserRunAsGroup() returned error: %v", err)
+	}
+
+	podSC, _, _ := unstructured.NestedMap(deployment.Object, "spec", "template", "spec", "securityContext")
+	if _, ok := podSC["runAsUser"]; ok {
+		t.Error("expected pod-level runAsUser to be removed")
+	}
+	if _, ok := podSC["runAsGroup"]; ok {
+		t.Error("expected pod-level runAsGroup to be removed")
+	}
+	// unrelated fields must be preserved
+	if _, ok := podSC["runAsNonRoot"]; !ok {
+		t.Error("expected pod-level runAsNonRoot to be preserved")
+	}
+
+	containers, _, _ := unstructured.NestedSlice(deployment.Object, "spec", "template", "spec", "containers")
+	containerSC, _ := containers[0].(map[string]interface{})["securityContext"].(map[string]interface{})
+	if _, ok := containerSC["runAsUser"]; ok {
+		t.Error("expected container-level runAsUser to be removed")
+	}
+	if _, ok := containerSC["runAsGroup"]; ok {
+		t.Error("expected container-level runAsGroup to be removed")
+	}
+}
+
+func TestRemoveRunAsUserRunAsGroupIgnoresOtherKinds(t *testing.T) {
+	cm := &unstructured.Unstructured{Object: map[string]interface{}{
+		"apiVersion": "v1",
+		"kind":       "ConfigMap",
+		"metadata":   map[string]interface{}{"name": "config"},
+	}}
+	if err := removeRunAsUserRunAsGroup(cm); err != nil {
+		t.Fatalf("removeRunAsUserRunAsGroup() returned error for ConfigMap: %v", err)
+	}
+}

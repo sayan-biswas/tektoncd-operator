@@ -139,4 +139,5 @@ const (
 	MultiClusterProxyAAEResourceName = "multicluster-proxy-aae"
 	SyncerServiceResourceName        = "syncer-service"
 	OperandSyncerService             = "syncer-service"
+	OpenShiftBuildResourceName       = "openshift-builds"
 )

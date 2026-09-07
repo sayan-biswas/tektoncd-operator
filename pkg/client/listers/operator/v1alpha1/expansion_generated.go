@@ -22,6 +22,10 @@ package v1alpha1
 // ManualApprovalGateLister.
 type ManualApprovalGateListerExpansion interface{}
 
+// OpenShiftBuildListerExpansion allows custom methods to be added to
+// OpenShiftBuildLister.
+type OpenShiftBuildListerExpansion interface{}
+
 // OpenShiftPipelinesAsCodeListerExpansion allows custom methods to be added to
 // OpenShiftPipelinesAsCodeLister.
 type OpenShiftPipelinesAsCodeListerExpansion interface{}

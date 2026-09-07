@@ -26,6 +26,8 @@ import (
 type Interface interface {
 	// ManualApprovalGates returns a ManualApprovalGateInformer.
 	ManualApprovalGates() ManualApprovalGateInformer
+	// OpenShiftBuilds returns a OpenShiftBuildInformer.
+	OpenShiftBuilds() OpenShiftBuildInformer
 	// OpenShiftPipelinesAsCodes returns a OpenShiftPipelinesAsCodeInformer.
 	OpenShiftPipelinesAsCodes() OpenShiftPipelinesAsCodeInformer
 	// SyncerServices returns a SyncerServiceInformer.
@@ -68,6 +70,11 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // ManualApprovalGates returns a ManualApprovalGateInformer.
 func (v *version) ManualApprovalGates() ManualApprovalGateInformer {
 	return &manualApprovalGateInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
+}
+
+// OpenShiftBuilds returns a OpenShiftBuildInformer.
+func (v *version) OpenShiftBuilds() OpenShiftBuildInformer {
+	return &openShiftBuildInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
 }
 
 // OpenShiftPipelinesAsCodes returns a OpenShiftPipelinesAsCodeInformer.

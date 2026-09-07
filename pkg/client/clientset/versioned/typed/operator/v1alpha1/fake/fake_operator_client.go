@@ -32,6 +32,10 @@ func (c *FakeOperatorV1alpha1) ManualApprovalGates() v1alpha1.ManualApprovalGate
 	return newFakeManualApprovalGates(c)
 }
 
+func (c *FakeOperatorV1alpha1) OpenShiftBuilds() v1alpha1.OpenShiftBuildInterface {
+	return newFakeOpenShiftBuilds(c)
+}
+
 func (c *FakeOperatorV1alpha1) OpenShiftPipelinesAsCodes() v1alpha1.OpenShiftPipelinesAsCodeInterface {
 	return newFakeOpenShiftPipelinesAsCodes(c)
 }

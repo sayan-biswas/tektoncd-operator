@@ -1372,6 +1372,54 @@ spec:
                     description: OpenShift allows configuring openshift specific components
                       and configurations
                     properties:
+                      builds:
+                        description: OpenShiftBuilds allows configuring Builds for
+                          OpenShift
+                        properties:
+                          sharedResource:
+                            description: |-
+                              SharedResource defines the desired state of the Shared Resource CSI Driver
+                              components.
+                            properties:
+                              state:
+                                default: Enabled
+                                description: |-
+                                  State defines the desired state of SharedResource CSI Driver, APIs, and
+                                  related components. Must be one of Enabled or Disabled.
+                                enum:
+                                - Enabled
+                                - Disabled
+                                type: string
+                            required:
+                            - state
+                            type: object
+                          shipwright:
+                            description: Shipwright defines the desired state of Shipwright
+                              components.
+                            properties:
+                              build:
+                                description: |-
+                                  Build defines the desired state of Shipwright Build APIs, controllers, and
+                                  related components.
+                                properties:
+                                  state:
+                                    default: Enabled
+                                    description: |-
+                                      State defines the desired state of the Shipwright Build controller, APIs,
+                                      and related components. Must be one of Enabled or Disabled.
+                                    enum:
+                                    - Enabled
+                                    - Disabled
+                                    type: string
+                                required:
+                                - state
+                                type: object
+                            type: object
+                          targetNamespace:
+                            description: TargetNamespace is where resources will be
+                              installed
+                            type: string
+                        type: object
                       enableCentralTLSConfig:
                         description: |-
                           EnableCentralTLSConfig controls TLS configuration inheritance from the
@@ -1383,13 +1431,20 @@ spec:
                           Default: true (opt-out)
                         type: boolean
                       enableMetricsMTLS:
-                        description: |
+                        description: |-
                           EnableMetricsMTLS controls whether Prometheus metrics endpoints use mTLS.
-                          When enabled the operator annotates metric Services for TLS certificate
-                          provisioning, renames ports from http-metrics to https-metrics, mounts
-                          the serving-cert Secret and client-CA ConfigMap into pods, and enforces
-                          client certificate verification. Requires the OpenShift Cluster Monitoring
-                          Operator (CMO). Default: false (opt-in).
+                          When enabled the operator:
+                            - annotates metric Services for automatic TLS certificate provisioning
+                              via the OpenShift service-serving-cert controller
+                            - renames the metrics port from "http-metrics" to "https-metrics"
+                            - mounts the serving-cert Secret and client-CA ConfigMap into Tekton pods
+                            - enforces client certificate verification (RequireAndVerifyClientCert)
+
+                          Requires the OpenShift Cluster Monitoring Operator (CMO) to be present,
+                          because the client CA bundle is read from
+                          kube-system/extension-apiserver-authentication.
+
+                          Default: false (opt-in). Set to true to activate metrics mTLS.
                         type: boolean
                       pipelinesAsCode:
                         description: PipelinesAsCode allows configuring PipelinesAsCode
@@ -1768,6 +1823,8 @@ spec:
                       match the key here
                     properties:
                       cel:
+                        description: CEL contains optional CEL expressions for dynamic
+                          PipelineRun mutation.
                         properties:
                           expressions:
                             items:
@@ -1775,8 +1832,15 @@ spec:
                             type: array
                         type: object
                       multiKueueOverride:
+                        description: |-
+                          MultiKueueOverride, when true, sets the PipelineRun's managedBy field
+                          to "kueue.x-k8s.io/multikueue", enabling Kueue to dispatch the
+                          PipelineRun to a remote worker cluster.
                         type: boolean
                       queueName:
+                        description: |-
+                          QueueName is the Kueue LocalQueue that PipelineRuns are assigned to.
+                          This is set as the "kueue.x-k8s.io/queue-name" label on each PipelineRun.
                         type: string
                     type: object
                     x-kubernetes-preserve-unknown-fields: true

@@ -55,6 +55,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	// Group=operator.tekton.dev, Version=v1alpha1
 	case v1alpha1.SchemeGroupVersion.WithResource("manualapprovalgates"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1alpha1().ManualApprovalGates().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("openshiftbuilds"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1alpha1().OpenShiftBuilds().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("openshiftpipelinesascodes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Operator().V1alpha1().OpenShiftPipelinesAsCodes().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("syncerservices"):

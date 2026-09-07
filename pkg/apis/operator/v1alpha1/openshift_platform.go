@@ -48,6 +48,10 @@ type OpenShift struct {
 	// Default: false (opt-in). Set to true to activate metrics mTLS.
 	// +optional
 	EnableMetricsMTLS *bool `json:"enableMetricsMTLS,omitempty"`
+
+	// OpenShiftBuilds allows configuring Builds for OpenShift
+	// +optional
+	Builds *OpenShiftBuildSpec `json:"builds,omitempty"`
 }
 
 type SCC struct {

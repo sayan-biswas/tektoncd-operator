@@ -33,6 +33,7 @@ import (
 	occommon "github.com/tektoncd/operator/pkg/reconciler/openshift/common"
 	"github.com/tektoncd/operator/pkg/reconciler/openshift/tektonconfig/extension"
 	"github.com/tektoncd/operator/pkg/reconciler/shared/hash"
+	openshiftbuild "github.com/tektoncd/operator/pkg/reconciler/shared/tektonconfig/openshiftbuild"
 	pac "github.com/tektoncd/operator/pkg/reconciler/shared/tektonconfig/pipelinesascode"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -230,6 +231,22 @@ func (oe openshiftExtension) PostReconcile(ctx context.Context, comp v1alpha1.Te
 		}
 	}
 
+	// Reconcile the singleton OpenShiftBuild CR to match
+	// spec.platforms.openshift.builds. The standalone OpenShiftBuild controller
+	// installs the components (Shipwright Build + Shared Resource CSI Driver). A
+	// nil spec removes the CR.
+	buildsClient := oe.operatorClientSet.OperatorV1alpha1().OpenShiftBuilds()
+	if buildsSpec := configInstance.Spec.Platforms.OpenShift.Builds; buildsSpec != nil {
+		if _, err := openshiftbuild.EnsureOpenShiftBuildExists(ctx, buildsClient, configInstance, oe.operatorVersion, buildsSpec); err != nil {
+			configInstance.Status.MarkComponentNotReady(fmt.Sprintf("OpenShiftBuild: %s", err.Error()))
+			return v1alpha1.REQUEUE_EVENT_AFTER
+		}
+	} else {
+		if err := openshiftbuild.EnsureOpenShiftBuildCRNotExists(ctx, buildsClient); err != nil {
+			return err
+		}
+	}
+
 	// execute console plugin reconciler
 	// TLS config was already resolved and cached in PreReconcile via SetTLSConfig.
 	return oe.consolePluginReconciler.reconcile(ctx, configInstance)
@@ -328,6 +345,10 @@ func (oe openshiftExtension) Finalize(ctx context.Context, comp v1alpha1.TektonC
 		if err := pac.EnsureOpenShiftPipelinesAsCodeCRNotExists(ctx, oe.operatorClientSet.OperatorV1alpha1().OpenShiftPipelinesAsCodes()); err != nil {
 			return err
 		}
+	}
+
+	if err := openshiftbuild.EnsureOpenShiftBuildCRNotExists(ctx, oe.operatorClientSet.OperatorV1alpha1().OpenShiftBuilds()); err != nil {
+		return err
 	}
 
 	if err := removeOperatorAdmissionWebhooks(ctx, oe.kubeClientSet); err != nil {

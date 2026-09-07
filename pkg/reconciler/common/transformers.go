@@ -58,6 +58,7 @@ const (
 	SyncerServiceImagePrefix        = "IMAGE_SYNCER_SERVICE_WORKLOAD_"
 	ResultsImagePrefix              = "IMAGE_RESULTS_"
 	DashboardImagePrefix            = "IMAGE_DASHBOARD_"
+	BuildsImagePrefix               = "IMAGE_BUILDS_"
 
 	DefaultTargetNamespace = "tekton-pipelines"
 

@@ -70,6 +70,9 @@ const (
 
 	// KindSyncerService is the Kind of SyncerService in a GVK context.
 	KindSyncerService = "SyncerService"
+
+	// KindOpenShiftBuild is the Kind of OpenShiftBuild in a GVK context.
+	KindOpenShiftBuild = "OpenShiftBuild"
 )
 
 // Resource takes an unqualified resource and returns a Group qualified GroupResource
@@ -109,6 +112,8 @@ func addKnownTypes(s *runtime.Scheme) error {
 		&TektonMulticlusterProxyAAEList{},
 		&SyncerService{},
 		&SyncerServiceList{},
+		&OpenShiftBuild{},
+		&OpenShiftBuildList{},
 	)
 	metav1.AddToGroupVersion(s, SchemeGroupVersion)
 	return nil

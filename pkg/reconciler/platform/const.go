@@ -32,6 +32,8 @@ const (
 	// ControllerOpenShiftPipelinesAsCode is the operand reconciler for OpenShiftPipelinesAsCode;
 	// the same name is used on Kubernetes and OpenShift so -controllers flags stay consistent.
 	ControllerOpenShiftPipelinesAsCode ControllerName = "openshiftpipelinesascode"
-	EnvControllerNames                 string         = "CONTROLLER_NAMES"
-	EnvSharedMainName                  string         = "UNIQUE_PROCESS_NAME"
+	// ControllerOpenShiftBuild is the operand reconciler for OpenShiftBuild (OpenShift-only).
+	ControllerOpenShiftBuild ControllerName = "openshiftbuild"
+	EnvControllerNames       string         = "CONTROLLER_NAMES"
+	EnvSharedMainName        string         = "UNIQUE_PROCESS_NAME"
 )
